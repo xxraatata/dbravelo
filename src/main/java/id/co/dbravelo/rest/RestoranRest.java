@@ -54,6 +54,7 @@ public class RestoranRest {
         return restoranDao.getRestoranByLocation(latitude, longitude);
     }
 
+
     @PostMapping("/upload")
     public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file) {
         try {
