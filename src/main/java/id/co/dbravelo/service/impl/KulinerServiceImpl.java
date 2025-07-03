@@ -6,7 +6,9 @@ import id.co.dbravelo.model.Restoran;
 import id.co.dbravelo.repository.KulinerRepo;
 import id.co.dbravelo.repository.RestoranRepo;
 import id.co.dbravelo.service.KulinerService;
+import id.co.dbravelo.vo.KulinerVo;
 import id.co.dbravelo.vo.KulinerVoForm;
+import id.co.dbravelo.vo.RestoranVo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,15 +28,26 @@ public class KulinerServiceImpl implements KulinerService {
     private RestoranRepo restoranRepo;
 
     @Override
+    public dtoResponse getByRestoId(int id) {
+        List<Kuliner> list = kulinerRepo.findByRestoranIdActive(id);
+        if (list != null) {
+            return new dtoResponse(200, list, "Berhasil mendapatkan data kuliner");
+        } else {
+            return new dtoResponse(404, null, "Restoran tidak ditemukan");
+        }
+    }
+
+    @Override
     public dtoResponse add(KulinerVoForm kulinerVoForm) {
         try {
-            List<Restoran> optionalRestoran = restoranRepo.findByIdActive(kulinerVoForm.getRestoranId());
+            Optional<Restoran> optionalRestoran = restoranRepo.findByIdActive(kulinerVoForm.getRestoranId());
             if (optionalRestoran.isEmpty()) {
-                return new dtoResponse(404,null, "Restoran tidak ditemukan");
+                return new dtoResponse(404, null, "Restoran tidak ditemukan");
             }
+            Restoran restoran = optionalRestoran.get();
 
             Kuliner kuliner = new Kuliner();
-            kuliner.setRestoran(optionalRestoran.get(0));
+            kuliner.setRestoran(restoran);
             kuliner.setNamaMakanan(kulinerVoForm.getNamaMakanan());
             kuliner.setDeskripsi(kulinerVoForm.getDeskripsi());
             kuliner.setHarga(kulinerVoForm.getHarga());

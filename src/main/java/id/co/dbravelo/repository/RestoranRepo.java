@@ -7,14 +7,15 @@ import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RestoranRepo extends JpaRepository<Restoran, Integer> {
-    @Query(value = "SELECT * FROM ms_restoran WHERE status = 1", nativeQuery = true)
+    @Query(value = "SELECT * FROM ms_restoran WHERE status = 1 ORDER BY created_at DESC;", nativeQuery = true)
     List<Restoran> findAllActive();
 
     @Query(value = "SELECT TOP 1 * FROM ms_restoran WHERE status = 1 AND restoran_id = :id", nativeQuery = true)
-    List<Restoran> findByIdActive(int id);
+    Optional<Restoran> findByIdActive(int id);
 
     @Query(value = " SELECT *, \n" +
             "(6371 * acos( \n" +

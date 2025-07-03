@@ -12,7 +12,6 @@ public class Kuliner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "kuliner_id")
     private Integer kulinerId;
-
     @ManyToOne
     @JoinColumn(name = "restoran_id", nullable = false)
     private Restoran restoran;

@@ -22,6 +22,17 @@ public class RestoranServiceImpl implements RestoranService {
     private RestoranRepo restoranRepo;
     @Autowired
     private RestoranDao restoranDao;
+
+    @Override
+    public dtoResponse getById(int id) {
+        RestoranVo vo = (RestoranVo) restoranDao.getRestoranById(id);
+        if (vo != null) {
+            return new dtoResponse(200, vo, "Berhasil mendapatkan data restoran");
+        } else {
+            return new dtoResponse(404, null, "Restoran tidak ditemukan");
+        }
+    }
+
     @Override
     public dtoResponse add(RestoranVoForm restoranVoForm) {
         try {

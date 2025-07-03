@@ -7,6 +7,7 @@ import id.co.dbravelo.vo.RestoranVoForm;
 import java.util.List;
 
 public interface RestoranService {
+    dtoResponse getById(int id);
     dtoResponse add(RestoranVoForm restoranVoForm);
     dtoResponse edit(RestoranVoForm restoranVoForm);
     dtoResponse delete(RestoranVoForm restoranVoForm);

@@ -15,7 +15,7 @@ public interface KulinerRepo extends JpaRepository<Kuliner, Integer> {
     List<Kuliner> findAllActive();
 
     @Query(value = "SELECT * FROM ms_kuliner WHERE status = 1 AND restoran_id = :restoID", nativeQuery = true)
-    List<Kuliner> findByRestoranIdActive(int restoranId);
+    List<Kuliner> findByRestoranIdActive(@Param("restoID") int restoranId);
 
     @Query(value = "SELECT * FROM ms_kuliner WHERE status = 1 AND kuliner_id = :id", nativeQuery = true)
     List<Kuliner> findByIdActive(int kulinerId);

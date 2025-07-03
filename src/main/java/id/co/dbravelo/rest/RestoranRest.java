@@ -43,17 +43,19 @@ public class RestoranRest {
     public List<RestoranVo> getAllRestoran() {
         return restoranDao.getAllRestoran();
     }
-    @PostMapping("/getById")
-    public List<RestoranVo> getRestoranById(@RequestBody RestoranVoForm form) {
-        return restoranDao.getRestoranById(form.getIdResto());
+
+    @GetMapping("/getById")
+    public ResponseEntity<dtoResponse> getRestoranById(@RequestParam("id") int id) {
+        dtoResponse response = restoranService.getById(id);
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
+
     @PostMapping("/getByLocation")
     public List<RestoranVo> getRestoranByLocation(@RequestBody RestoranVoForm form) {
         double latitude = form.getLatitude();
         double longitude = form.getLongitude();
         return restoranDao.getRestoranByLocation(latitude, longitude);
     }
-
 
     @PostMapping("/upload")
     public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file) {
