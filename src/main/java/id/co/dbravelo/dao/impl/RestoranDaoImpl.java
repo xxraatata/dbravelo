@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class RestoranDaoImpl implements RestoranDao {
@@ -25,13 +26,10 @@ public class RestoranDaoImpl implements RestoranDao {
     }
 
     @Override
-    public List<RestoranVo> getRestoranById(int id) {
-        List<Restoran> data = restoranRepo.findByIdActive(id);
-        List<RestoranVo> result = new ArrayList<>();
-        for (Restoran item : data) {
-            result.add(new RestoranVo(item));
-        }
-        return result;
+    public RestoranVo getRestoranById(int id) {
+        return restoranRepo.findByIdActive(id)
+                .map(RestoranVo::new)
+                .orElse(null);
     }
 
     @Override

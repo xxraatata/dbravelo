@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface RestoranDao {
     List<RestoranVo> getAllRestoran();
-    List<RestoranVo> getRestoranById(int id);
+    RestoranVo getRestoranById(int id);
+
     List<RestoranVo> getRestoranByLocation(double latitude, double longitude);
 }

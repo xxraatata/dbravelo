@@ -1,11 +1,14 @@
 package id.co.dbravelo.rest;
 
 import id.co.dbravelo.dao.RestoranDao;
+import id.co.dbravelo.dao.ReviewMakananDao;
 import id.co.dbravelo.dtoResponse;
+import id.co.dbravelo.model.ReviewMakanan;
 import id.co.dbravelo.service.RestoranService;
-import id.co.dbravelo.vo.RestoranVo;
-import id.co.dbravelo.vo.RestoranVoForm;
-import jakarta.servlet.http.HttpServletRequest;
+import id.co.dbravelo.service.ReviewMakananService;
+import id.co.dbravelo.vo.KulinerbyResto;
+import id.co.dbravelo.vo.ReviewMakananVo;
+import id.co.dbravelo.vo.ReviewMakananVoForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -20,105 +23,87 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
-@RequestMapping("/resto")
+@RequestMapping("/review")
 @CrossOrigin(origins = "*")
-public class RestoranRest {
+public class ReviewMakananRest {
 
     @Autowired
-    private RestoranService restoranService;
+    private ReviewMakananService reviewService;
     @Autowired
-    private RestoranDao restoranDao;
+    private ReviewMakananDao reviewDao;
 
-    public RestoranRest(RestoranService restoranService) {
-        this.restoranService = restoranService;
+    public ReviewMakananRest(ReviewMakananService reviewService) {
+        this.reviewService = reviewService;
     }
 
-    @GetMapping("/getAll")
-    public List<RestoranVo> getAllRestoran() {
-        return restoranDao.getAllRestoran();
+    @GetMapping("/getKuliner")
+    public List<KulinerbyResto> getKuliner(@RequestParam double latitude, @RequestParam double longitude){
+        return reviewDao.getKuliner(latitude, longitude);
     }
 
-    @GetMapping("/getById")
-    public ResponseEntity<dtoResponse> getRestoranById(@RequestParam("id") int id) {
-        dtoResponse response = restoranService.getById(id);
-        return ResponseEntity.status(response.getStatus()).body(response);
+    @GetMapping("/byRestoran")
+    public List<ReviewMakananVo> byRestoran(@RequestParam("id") int id) {
+        return  reviewDao.getReviewByRestoran(id);
     }
 
-    @PostMapping("/getByLocation")
-    public List<RestoranVo> getRestoranByLocation(@RequestBody RestoranVoForm form) {
-        double latitude = form.getLatitude();
-        double longitude = form.getLongitude();
-        return restoranDao.getRestoranByLocation(latitude, longitude);
+    @GetMapping("/byUser")
+    public List<ReviewMakananVo> getByUser(@RequestParam("id") int id) {
+        return reviewDao.getReviewByUser(id);
+    }
+
+    @GetMapping("/byId")
+    public ReviewMakananVo getById(@RequestParam("id") int id) {
+        return reviewDao.getReviewById(id);
     }
 
     @PostMapping("/upload")
     public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file) {
         try {
-            // Validasi file kosong
             if (file.isEmpty()) {
-                return ResponseEntity.badRequest()
-                        .body(Collections.singletonMap("error", "File is empty"));
+                return ResponseEntity.badRequest().body(Collections.singletonMap("error", "File is empty"));
             }
 
-            // Validasi ukuran file (maksimal 10MB)
             if (file.getSize() > 10 * 1024 * 1024) {
-                return ResponseEntity.badRequest()
-                        .body(Collections.singletonMap("error", "File too large (max 10MB)"));
+                return ResponseEntity.badRequest().body(Collections.singletonMap("error", "File too large (max 10MB)"));
             }
 
-            // Validasi tipe file
             String contentType = file.getContentType();
             if (!contentType.startsWith("image/")) {
-                return ResponseEntity.badRequest()
-                        .body(Collections.singletonMap("error", "Only image files allowed"));
+                return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Only image files allowed"));
             }
 
-            // Validasi nama file
             String originalFileName = file.getOriginalFilename();
             if (originalFileName == null || originalFileName.contains("..")) {
-                return ResponseEntity.badRequest()
-                        .body(Collections.singletonMap("error", "Invalid file name"));
+                return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Invalid file name"));
             }
 
-            // Dapatkan ekstensi file
             String fileExtension = "";
             int lastDot = originalFileName.lastIndexOf('.');
             if (lastDot > 0) {
                 fileExtension = originalFileName.substring(lastDot);
             }
 
-            // Date untuk nama file
-            LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS");
-            String timestamp = now.format(formatter);
-
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS"));
             String uuid = UUID.randomUUID().toString();
-            // Nama file baru
-            String fileName = String.format("RESTORANIMG_%s_%s%s", timestamp, uuid, fileExtension);
+            String fileName = String.format("REVIEWIMG_%s_%s%s", timestamp, uuid, fileExtension);
 
             String folderPath = "src/main/resources/uploads/";
             File folder = new File(folderPath);
-            if (!folder.exists()) {
-                folder.mkdirs(); // buat folder jika belum ada
-            }
+            if (!folder.exists()) folder.mkdirs();
 
-            // Simpan file
             Path filePath = Paths.get(folderPath, fileName);
             Files.write(filePath, file.getBytes());
 
-            // PERBAIKAN: Kembalikan URL lengkap yang bisa diakses
-            // Ganti dengan IP address server Anda
-            String imageUrl = "/resto/uploads/" + fileName;
+            String imageUrl = "/kuliner/uploads/" + fileName;
 
             Map<String, String> response = new HashMap<>();
             response.put("filename", fileName);
-            response.put("url", imageUrl); // Tambahkan URL lengkap
+            response.put("url", imageUrl);
             response.put("message", "Upload successful");
 
             return ResponseEntity.ok(response);
@@ -131,7 +116,6 @@ public class RestoranRest {
         }
     }
 
-    // Endpoint untuk serve static files
     @GetMapping("/uploads/{filename}")
     public ResponseEntity<Resource> getImage(@PathVariable String filename) {
         try {
@@ -139,10 +123,8 @@ public class RestoranRest {
             Resource resource = new UrlResource(filePath.toUri());
 
             if (resource.exists() && resource.isReadable()) {
-                String contentType = "image/jpeg";
-
                 return ResponseEntity.ok()
-                        .contentType(MediaType.parseMediaType(contentType))
+                        .contentType(MediaType.IMAGE_JPEG)
                         .header("Cache-Control", "max-age=3600")
                         .body(resource);
             } else {
@@ -155,20 +137,26 @@ public class RestoranRest {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<dtoResponse> addRestoran(@RequestBody RestoranVoForm form) {
-        dtoResponse response = restoranService.add(form);
+    public ResponseEntity<dtoResponse> addReview(@RequestBody ReviewMakananVoForm form) {
+        dtoResponse response = reviewService.add(form);
         return new ResponseEntity<>(response, getHttpStatus(response.getStatus()));
     }
 
     @PostMapping("/edit")
-    public ResponseEntity<dtoResponse> editRestoran(@RequestBody RestoranVoForm form) {
-        dtoResponse response = restoranService.edit(form);
+    public ResponseEntity<dtoResponse> editReview(@RequestBody ReviewMakananVoForm form) {
+        dtoResponse response = reviewService.update(form);
         return new ResponseEntity<>(response, getHttpStatus(response.getStatus()));
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<dtoResponse> deleteRestoran(@RequestBody RestoranVoForm form) {
-        dtoResponse response = restoranService.delete(form);
+    public ResponseEntity<dtoResponse> deleteReview(@RequestBody ReviewMakananVoForm form) {
+        dtoResponse response = reviewService.delete(form);
+        return new ResponseEntity<>(response, getHttpStatus(response.getStatus()));
+    }
+
+    @GetMapping("/byKuliner")
+    public ResponseEntity<dtoResponse> getByKuliner(@RequestParam("id") int kulinerId) {
+        dtoResponse response = reviewService.getByKulinerId(kulinerId);
         return new ResponseEntity<>(response, getHttpStatus(response.getStatus()));
     }
 
@@ -180,5 +168,4 @@ public class RestoranRest {
         };
     }
 }
-
 

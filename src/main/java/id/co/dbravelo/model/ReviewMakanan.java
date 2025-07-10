@@ -5,50 +5,54 @@ import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "ms_kuliner")
-public class Kuliner {
-
+@Table(name = "trs_review_makanan")
+public class ReviewMakanan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "kuliner_id")
-    private Integer kulinerId;
-    @ManyToOne
-    @JoinColumn(name = "restoran_id", nullable = false)
-    private Restoran restoran;
-    @Column(name = "nama_makanan")
-    private String namaMakanan;
-    @Column(name = "deskripsi")
-    private String deskripsi;
-    @Column(name = "harga")
-    private Integer harga;
+    @Column(name = "review_id")
+    private Integer reviewId;
+    @Column(name = "user_id")
+    private Integer userId;
+
+    @Column(name = "makanan_id")
+    private Integer makananId;
+
+    @Column(name = "rating")
+    private Integer rating;
+
+    @Column(name = "review_text")
+    private String reviewText;
+
     @Column(name = "foto_makanan")
     private String fotoMakanan;
-    @Column(name = "jenis_makanan")
-    private String jenisMakanan;
+
     @Column(name = "created_by")
     private String createdBy;
+
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+
     @Column(name = "modified_by")
     private String modifiedBy;
+
     @Column(name = "modified_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifiedAt;
+
     @Column(name = "status")
     private Integer status;
 
-    public Kuliner() {
+    public ReviewMakanan() {
     }
 
-    public Kuliner(Integer kulinerId, Restoran restoran, String namaMakanan, String deskripsi, Integer harga, String fotoMakanan, String jenisMakanan, String createdBy, Date createdAt, String modifiedBy, Date modifiedAt, Integer status) {
-        this.kulinerId = kulinerId;
-        this.restoran = restoran;
-        this.namaMakanan = namaMakanan;
-        this.deskripsi = deskripsi;
-        this.harga = harga;
+    public ReviewMakanan(Integer reviewId, Integer userId, Integer makananId, Integer rating, String reviewText, String fotoMakanan, String createdBy, Date createdAt, String modifiedBy, Date modifiedAt, Integer status) {
+        this.reviewId = reviewId;
+        this.userId = userId;
+        this.makananId = makananId;
+        this.rating = rating;
+        this.reviewText = reviewText;
         this.fotoMakanan = fotoMakanan;
-        this.jenisMakanan = jenisMakanan;
         this.createdBy = createdBy;
         this.createdAt = createdAt;
         this.modifiedBy = modifiedBy;
@@ -56,44 +60,44 @@ public class Kuliner {
         this.status = status;
     }
 
-    public Integer getKulinerId() {
-        return kulinerId;
+    public Integer getReviewId() {
+        return reviewId;
     }
 
-    public void setKulinerId(Integer kulinerId) {
-        this.kulinerId = kulinerId;
+    public void setReviewId(Integer reviewId) {
+        this.reviewId = reviewId;
     }
 
-    public Restoran getRestoran() {
-        return restoran;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setRestoran(Restoran restoran) {
-        this.restoran = restoran;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
-    public String getNamaMakanan() {
-        return namaMakanan;
+    public Integer getMakananId() {
+        return makananId;
     }
 
-    public void setNamaMakanan(String namaMakanan) {
-        this.namaMakanan = namaMakanan;
+    public void setMakananId(Integer makananId) {
+        this.makananId = makananId;
     }
 
-    public String getDeskripsi() {
-        return deskripsi;
+    public Integer getRating() {
+        return rating;
     }
 
-    public void setDeskripsi(String deskripsi) {
-        this.deskripsi = deskripsi;
+    public void setRating(Integer rating) {
+        this.rating = rating;
     }
 
-    public Integer getHarga() {
-        return harga;
+    public String getReviewText() {
+        return reviewText;
     }
 
-    public void setHarga(Integer harga) {
-        this.harga = harga;
+    public void setReviewText(String reviewText) {
+        this.reviewText = reviewText;
     }
 
     public String getFotoMakanan() {
@@ -102,14 +106,6 @@ public class Kuliner {
 
     public void setFotoMakanan(String fotoMakanan) {
         this.fotoMakanan = fotoMakanan;
-    }
-
-    public String getJenisMakanan() {
-        return jenisMakanan;
-    }
-
-    public void setJenisMakanan(String jenisMakanan) {
-        this.jenisMakanan = jenisMakanan;
     }
 
     public String getCreatedBy() {
