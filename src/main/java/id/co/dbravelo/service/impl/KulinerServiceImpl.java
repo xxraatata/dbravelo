@@ -28,6 +28,16 @@ public class KulinerServiceImpl implements KulinerService {
     private RestoranRepo restoranRepo;
 
     @Override
+    public dtoResponse getAll() {
+        try {
+            List<Kuliner> list = kulinerRepo.findAllByStatus(1); // hanya data aktif
+            return new dtoResponse(200, list, "Berhasil mengambil semua data kuliner");
+        } catch (Exception e) {
+            return new dtoResponse(500, null, "Gagal mengambil data kuliner: " + e.getMessage());
+        }
+    }
+
+    @Override
     public dtoResponse getByRestoId(int id) {
         List<Kuliner> list = kulinerRepo.findByRestoranIdActive(id);
         if (list != null) {

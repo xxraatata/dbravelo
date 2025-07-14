@@ -36,6 +36,12 @@ public class KulinerRest {
         this.kulinerService = kulinerService;
     }
 
+    @GetMapping("/getAll")
+    public ResponseEntity<dtoResponse> getAllKuliner() {
+        dtoResponse response = kulinerService.getAll();
+        return new ResponseEntity<>(response, getHttpStatus(response.getStatus()));
+    }
+
     @GetMapping("/getByRestoId")
     public ResponseEntity<dtoResponse> getKulinerByRestoId(@RequestParam("id") int id) {
         dtoResponse response = kulinerService.getByRestoId(id);

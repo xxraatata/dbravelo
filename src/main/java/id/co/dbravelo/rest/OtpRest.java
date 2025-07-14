@@ -13,28 +13,24 @@ public class OtpRest {
     @Autowired
     private OtpService otpService;
 
-    // 1. Generate OTP (berdasarkan username)
     @PostMapping("/generate")
     public OtpResponse generateOtp(@RequestBody UsernameRequest req) {
         String otp = otpService.generateOtp(req.getUsername());
-        return new OtpResponse("OTP generated", otp); // ⚠️ OTP dikembalikan langsung untuk demo
+        return new OtpResponse("OTP generated", otp);
     }
 
     // 2. Verifikasi OTP
     @PostMapping("/verify")
     public MessageResponse verifyOtp(@RequestBody OtpVerificationRequest req) {
-        otpService.verifyOtp(req.getUsername(), req.getOtp()); // Exception akan dilempar jika gagal
+        otpService.verifyOtp(req.getUsername(), req.getOtp());
         return new MessageResponse("OTP verified");
     }
 
-    // 3. Reset Password
     @PostMapping("/reset")
     public MessageResponse resetPassword(@RequestBody ResetPasswordRequest req) {
         otpService.resetPassword(req.getUsername(), req.getNewPassword());
         return new MessageResponse("Password updated");
     }
-
-    // ======================= DTO CLASSES =======================
 
     @Data
     public static class UsernameRequest {

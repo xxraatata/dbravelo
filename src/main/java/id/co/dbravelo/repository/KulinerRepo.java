@@ -11,6 +11,8 @@ import java.util.List;
 
 @Repository
 public interface KulinerRepo extends JpaRepository<Kuliner, Integer> {
+    List<Kuliner> findAllByStatus(int status);
+
     @Query(value = "SELECT * FROM ms_kuliner WHERE status = 1", nativeQuery = true)
     List<Kuliner> findAllActive();
 

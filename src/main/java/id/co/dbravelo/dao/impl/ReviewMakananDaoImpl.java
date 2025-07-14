@@ -1,8 +1,10 @@
 package id.co.dbravelo.dao.impl;
 
 import id.co.dbravelo.dao.ReviewMakananDao;
+import id.co.dbravelo.model.ReviewFoto;
 import id.co.dbravelo.model.ReviewMakanan;
 import id.co.dbravelo.repository.KulinerRepo;
+import id.co.dbravelo.repository.ReviewFotoRepo;
 import id.co.dbravelo.repository.ReviewMakananRepo;
 import id.co.dbravelo.vo.KulinerbyResto;
 import id.co.dbravelo.vo.ReviewMakananVo;
@@ -18,7 +20,8 @@ public class ReviewMakananDaoImpl implements ReviewMakananDao {
     private ReviewMakananRepo reviewRepo;
     @Autowired
     private KulinerRepo kulinerRepo;
-
+    @Autowired
+    private ReviewFotoRepo reviewFotoRepo;
 
     @Override
     public ReviewMakananVo getReviewById(int id) {
@@ -31,15 +34,25 @@ public class ReviewMakananDaoImpl implements ReviewMakananDao {
     public List<ReviewMakananVo> getReviewByRestoran(int id) {
         List<ReviewMakanan> data = reviewRepo.findReviewMakananByRestoranId(id);
         List<ReviewMakananVo> result = new ArrayList<>();
+
         for (ReviewMakanan reviewMakanan : data) {
             ReviewMakananVo vo = new ReviewMakananVo(reviewMakanan);
 
-            kulinerRepo.findById(reviewMakanan.getMakananId()).ifPresent(kuliner -> {
-                vo.setNamaMakanan(kuliner.getNamaMakanan());
+            // Set nama makanan
+            kulinerRepo.findById(reviewMakanan.getMakananId()).ifPresent(k -> {
+                vo.setNamaMakanan(k.getNamaMakanan());
             });
+
+            // Ambil semua foto berdasarkan review_id
+            List<ReviewFoto> fotoList = reviewFotoRepo.findByReviewId(reviewMakanan.getReviewId());
+            List<String> urls = fotoList.stream().map(ReviewFoto::getUrl).toList();
+
+            // Set jadi satu string dipisah koma
+            vo.setFotoMakanan(String.join(",", urls));
 
             result.add(vo);
         }
+
         return result;
     }
 
