@@ -42,6 +42,12 @@ public class KulinerRest {
         return new ResponseEntity<>(response, getHttpStatus(response.getStatus()));
     }
 
+    @GetMapping("/getById")
+    public ResponseEntity<dtoResponse> getById(@RequestParam("id") int id) {
+        dtoResponse response = kulinerService.getById(id);
+        return new ResponseEntity<>(response, getHttpStatus(response.getStatus()));
+    }
+
     @GetMapping("/getByRestoId")
     public ResponseEntity<dtoResponse> getKulinerByRestoId(@RequestParam("id") int id) {
         dtoResponse response = kulinerService.getByRestoId(id);

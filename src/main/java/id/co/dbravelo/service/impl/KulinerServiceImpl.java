@@ -38,6 +38,20 @@ public class KulinerServiceImpl implements KulinerService {
     }
 
     @Override
+    public dtoResponse getById(int id) {
+        try {
+            Optional<Kuliner> optionalKuliner = kulinerRepo.findById(id);
+            if (optionalKuliner.isEmpty() || optionalKuliner.get().getStatus() != 1) {
+                return new dtoResponse(404, null, "Kuliner tidak ditemukan");
+            }
+
+            return new dtoResponse(200, optionalKuliner.get(), "Berhasil mengambil kuliner");
+        } catch (Exception e) {
+            return new dtoResponse(500, null, "Gagal mengambil kuliner: " + e.getMessage());
+        }
+    }
+
+    @Override
     public dtoResponse getByRestoId(int id) {
         List<Kuliner> list = kulinerRepo.findByRestoranIdActive(id);
         if (list != null) {
